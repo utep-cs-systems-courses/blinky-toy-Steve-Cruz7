@@ -36,25 +36,25 @@ void blinkUpdate()           // called every 1/250s to blink with duty cycle 1/b
     greenControl(0);
 }
 
-void oncePerSecond() // repeatedly start bright and gradually lower duty cycle, one step/sec
+void oncePerSecond()    // repeatedly start bright and gradually lower duty cycle, one step/sec
 {
-  blinkLimit ++;  // reduce duty cycle
+  blinkLimit ++;        // reduce duty cycle
   if (blinkLimit >= 8)  // but don't let duty cycle go below 1/7.
     blinkLimit = 0;
 }
 
-void secondUpdate()  // called every 1/250 sec to call oncePerSecond once per second
+void secondUpdate()           // called every 1/250 sec to call oncePerSecond once per second
 {
   static int secondCount = 0; // state variable representing repeating time 0…1s
   secondCount ++;
-  if (secondCount >= 250) { // once each second
+  if (secondCount >= 250) {   // once each second
     secondCount = 0;
-    oncePerSecond();
+    oncePerSecond();          //After a second has elapsed, increase blink count
   } }
 
 void timeAdvStateMachines() // called every 1/250 sec
 {
-  blinkUpdate();
+  blinkUpdate();           
   secondUpdate();
 }
 

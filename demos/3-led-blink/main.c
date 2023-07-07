@@ -16,14 +16,23 @@ int main(void) {
 
 // global state var to count time
 int secondCount = 0;
+int thirdCount = 125;
 
 void
 __interrupt_vec(WDT_VECTOR) WDT()	/* 250 interrupts/sec */
 {
   secondCount ++;
-  if (secondCount >= 250) { 	/* once each sec... */
-    secondCount = 0;		/* reset count */
+  thirdCount ++;
+  if (secondCount >= 250) {     /* once each sec... */
+    secondCount = 0;            /* reset count */
     P1OUT ^= LED_GREEN;		/* toggle green LED */
   }
+  else if(thirdCount >= 250){  //Happens twice a second
+    thirdCount = 125;          
+    P1OUT ^= LED_RED;          
+    }
+  
+
+  
 } 
 

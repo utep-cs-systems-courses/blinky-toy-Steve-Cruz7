@@ -13,7 +13,9 @@ void main(void)
   configureClocks();
 
   P1DIR |= LEDS;
-  P1OUT &= ~LEDS;		/* leds initially off */
+  // P1OUT &= ~LEDS;		/* leds initially off */
+  P1OUT |= LED_RED;
+  P1OUT &= ~LED_GREEN;
   
   P1REN |= SWITCHES;		/* enables resistors for switches */
   P1IE |= SWITCHES;		/* enable interrupts from switches */
@@ -34,12 +36,14 @@ switch_interrupt_handler()
 
 /* up=red, down=green */
   if (p1val & SW1) {
-    P1OUT |= LED_RED;
-    P1OUT &= ~LED_GREEN;
-  } else {
+    P1OUT ^= LEDS;
+    // P1OUT |= LED_RED;
+    // P1OUT &= ~LED_GREEN;
+  }
+  /*  else {
     P1OUT |= LED_GREEN;
     P1OUT &= ~LED_RED;
-  }
+    } */
 }
 
 
