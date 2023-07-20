@@ -31,6 +31,8 @@ void main(void)
   or_sr(0x18);  // CPU off, GIE on
 } 
 
+int state = 0;
+
 void
 switch_interrupt_handler()
 {
@@ -42,11 +44,13 @@ switch_interrupt_handler()
 
 /* up=red, down=green */
   if (p1val & SW1) {
-     P1OUT &= ~LED_RED;  
+     P1OUT &= ~LED_RED;                //Everytime switch is pressed, switch states;
+     state = 0;
   }
   else {
     P1OUT |= LED_RED;
-    }
+    state = 1;
+  }
 }
 
 
@@ -60,7 +64,6 @@ __interrupt_vec(PORT1_VECTOR) Port_1(){
 }
 
 int interrupts = 1;
-int state = 0;
 int secondCount = 0;
 
 void statePicker(int state){
