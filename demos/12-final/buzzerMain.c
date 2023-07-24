@@ -33,6 +33,8 @@ int main() {
 }
 
 int state = 0;
+int interrupts = 1;
+int secondCount = 0;
 
 void
 bswitch_interrupt_handler()
@@ -47,35 +49,14 @@ bswitch_interrupt_handler()
   if(p1val & SW1){
     P1OUT &= ~RED;
     state = 0;
+    secondCount = 0;
+    interrupts = 1;
   }
   else{
     P1OUT |= RED;
     state = 1;
-  }
-}
-
-void
-tswitch_interrupt_handler(){
-  char p2val = P2IN;
-
-  P2IES |= (p2val & TSWITCHES);  //If the switch isnt pressed, sense down
-  P2IES &= (p2val | ~TSWITCHES); //If the switch is pressed, sense up
-
-  //Different cases for each top switch (press == 0, unpress == 1 )
-  if(p2val ^ TSW1){  //change p2val & TSW1 to P2IFG & TSW1 
-    buzzer_set_period(5000);
-  }
-  else if(p2val ^ TSW2){
-    buzzer_set_period(5100);
-  }
-  else if(p2val ^ TSW3){               //If a button is pressed, a tone will be played
-    buzzer_set_period(5200);           //Otherwise, turn off tone
-  }
-  else if(p2val ^ TSW4){
-    buzzer_set_period(5300);
-  }
-  else{
-    buzzer_set_period(0);
+    secondCount = 0;
+    interrupts = 1;
   }
 }
 
@@ -84,6 +65,7 @@ void
 __interrupt_vec(PORT1_VECTOR) Port_1(){
   if(P1IFG & BSWITCHES){
     P1IFG &= ~BSWITCHES;
+    buzzer_set_period(0);
     bswitch_interrupt_handler();
   }
 }
@@ -91,14 +73,31 @@ __interrupt_vec(PORT1_VECTOR) Port_1(){
 //Switches on P2
 void
 __interrupt_vec(PORT2_VECTOR) Port_2(){
-  if(P2IFG & TSWITCHES){
-    P2IFG &= ~TSWITCHES;
-    tswitch_interrupt_handler();
+  if(P2IFG & TSW1){
+    P2IFG &= ~TSW1;
+    playFsharp();
+    //call on switch 1 state;
+    
+  }
+  else if(P2IFG & TSW2){
+    P2IFG &= ~TSW2;
+    playG();
+    //call on switch 2 state;
+  }
+  else if(P2IFG & TSW3){               //If an input is detected from buttons, do something
+    P2IFG &= ~TSW3;                    //Eventually need to just change states for WDT interrupt
+    playA();
+    //call on switch 3 state;          //In order to play songs
+  }
+  else if(P2IFG & TSW4){
+    P2IFG &= ~TSW4;
+    playCsharp();
+    //call on switch 4 state;
   }
 }
 
-int interrupts = 1;
-int secondCount = 0;
+
+
 
 void statePicker(int state){
   if(state == 0){
@@ -112,7 +111,7 @@ void statePicker(int state){
 void
 __interrupt_vec(WDT_VECTOR) WDT(){
   statePicker(state);
-  //buzzer_set_period(interrupts);	/* start buzzing!!! 2MHz/interrupts = 2mHz happens x times
+  // buzzer_set_period(0);	 start buzzing!!! 2MHz/interrupts = 2mHz happens x times
   
   if((interrupts++) == 250){
     interrupts = 0;
